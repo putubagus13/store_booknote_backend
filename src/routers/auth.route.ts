@@ -1,5 +1,11 @@
 import AuthController from "@/controllers/auth.controller";
-import { GetUserProfile, LoginDto, RegisterDto } from "@/dto/auth.dto";
+import {
+  ForgotPassword,
+  GetUserProfile,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from "@/dto/auth.dto";
 import { AuthMiddleware } from "@/middlewares/auth.middleware";
 import { ValidationMiddleware } from "@/middlewares/validation.middleware";
 import { Router } from "express";
@@ -32,6 +38,19 @@ export default class AuthRoute {
       `${this.path}/register`,
       ValidationMiddleware("body", RegisterDto),
       this.authController.register
+    );
+
+    this.router.post(
+      `${this.path}/forgot-password`,
+      ValidationMiddleware("body", ForgotPassword),
+      this.authController.forgotPassword
+    );
+
+    //PUT
+    this.router.put(
+      `${this.path}/reset-password`,
+      ValidationMiddleware("body", ResetPasswordDto),
+      this.authController.resetPassword
     );
   }
 }

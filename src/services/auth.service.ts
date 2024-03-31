@@ -1,4 +1,9 @@
-import { LoginDto, RegisterDto } from "@/dto/auth.dto";
+import {
+  ForgotPassword,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from "@/dto/auth.dto";
 import { Service } from "typedi";
 import bcrypt from "bcrypt";
 import { sequelize } from "@/configs/database.config";
@@ -127,5 +132,61 @@ export default class AuthService {
   public getUserProfile = async (session: IAuthTokenPayload) => {
     const user = await this.authBase({ userId: session.userId });
     return user;
+  };
+
+  public forgotPassword = async ({ email }: ForgotPassword) => {
+    const foundUser = await User.findOne({ where: { email } });
+
+    if (!foundUser) {
+      throw new HttpException(400, "User not found");
+    }
+
+    const userStore = await UserStore.findOne({
+      where: { userId: foundUser.userId },
+    });
+
+    if (!userStore) {
+      throw new HttpException(400, "User store not found");
+    }
+
+    const payload: IAuthTokenPayload = {
+      userId: foundUser.userId,
+      fullname: foundUser.fullname,
+      email: foundUser.email,
+      imageUrl: foundUser.imageUrl,
+      storeId: userStore.storeId,
+    };
+
+    const token = jwt.sign(payload, SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
+    return token;
+  };
+
+  public resetPassword = async (dto: ResetPasswordDto) => {
+    if (dto.password !== dto.confirmPassword) {
+      throw new HttpException(400, "Password not match");
+    }
+
+    const decoded = jwt.verify(dto.token, SECRET_KEY) as IAuthTokenPayload;
+    if (!decoded) {
+      throw new HttpException(400, "Token invalid");
+    }
+
+    const hashPassword = bcrypt.hashSync(dto.password, 10);
+    const userPassword = await UserPassword.findOne({
+      where: { userId: decoded.userId },
+    });
+
+    try {
+      userPassword.hashPassword = hashPassword;
+      userPassword.updatedDt = new Date();
+      await userPassword.save();
+    } catch (error) {
+      throw new HttpException(400, error.message);
+    }
+
+    return true;
   };
 }

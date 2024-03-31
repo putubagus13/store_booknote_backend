@@ -1,4 +1,9 @@
-import { LoginDto, RegisterDto } from "@/dto/auth.dto";
+import {
+  ForgotPassword,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from "@/dto/auth.dto";
 import { HttpException } from "@/global/http-exception";
 import { ResponseSuccess } from "@/global/response";
 import { IAuthTokenPayload } from "@/interfaces/auth.interface";
@@ -48,7 +53,42 @@ export default class AuthController {
 
       if (!payload) throw new HttpException(400, "Get user profile failed");
 
-      return this.response.Response200(res, { payload });
+      return this.response.Response200(res, { data: payload });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public forgotPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const dto: ForgotPassword = req.body as unknown as { email: string };
+
+      const payload = await this.authService.forgotPassword(dto);
+      if (!payload) throw new HttpException(400, "User not found");
+
+      return this.response.Response200(res, { token: payload });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public resetPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const dto = req.body as unknown as ResetPasswordDto;
+
+      const payload = await this.authService.resetPassword(dto);
+
+      if (!payload) throw new HttpException(400, "Reset password failed");
+
+      return this.response.Response200(res);
     } catch (error) {
       next(error);
     }
