@@ -1,5 +1,5 @@
-import { Sequelize, Model, DataTypes } from "sequelize";
-import { sequelize } from "@/configs/database.config";
+import { Sequelize, Model, DataTypes } from 'sequelize';
+import { sequelize } from '@/configs/database.config';
 
 export default class User extends Model {
   declare userId: string;
@@ -20,58 +20,58 @@ User.init(
       type: DataTypes.CHAR(36),
       allowNull: false,
       primaryKey: true,
-      field: "user_id",
+      field: 'user_id',
     },
     fullname: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      field: "fullname",
+      field: 'fullname',
     },
     imageUrl: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      field: "image_url",
+      field: 'image_url',
     },
     phoneNumber: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      field: "phone_number",
+      field: 'phone_number',
     },
     email: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      field: "email",
+      field: 'email',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "created_by",
+      field: 'created_by',
     },
     createdDt: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: Sequelize.fn("current_timestamp"),
-      field: "created_dt",
+      defaultValue: new Date(),
+      field: 'created_dt',
     },
     updatedBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "updated_by",
+      field: 'updated_by',
     },
     updatedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "updated_dt",
+      field: 'updated_dt',
     },
     deletedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "deleted_dt",
+      field: 'deleted_dt',
     },
   },
   {
     sequelize,
-    tableName: "user",
-    modelName: "User",
-  }
+    tableName: 'user',
+    modelName: 'User',
+  },
 );

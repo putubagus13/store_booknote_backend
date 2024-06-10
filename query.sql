@@ -135,3 +135,15 @@ CREATE TABLE product_store (
     updated_dt DATETIME,
     deleted_dt DATETIME
 );
+
+CREATE TABLE store_type (
+    id VARCHAR(36) PRIMARY KEY,
+    type INT,
+    name VARCHAR(255),
+    description TEXT,
+    created_by VARCHAR(36),
+    created_dt DATETIME,
+    updated_by VARCHAR(36),
+    updated_dt DATETIME,
+    deleted_dt DATETIME
+);

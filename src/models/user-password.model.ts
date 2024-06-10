@@ -1,5 +1,5 @@
-import { Sequelize, DataTypes, Model } from "sequelize";
-import { sequelize } from "@/configs/database.config";
+import { Sequelize, DataTypes, Model } from 'sequelize';
+import { sequelize } from '@/configs/database.config';
 
 export class UserPassword extends Model {
   declare id: string;
@@ -18,48 +18,48 @@ UserPassword.init(
       type: DataTypes.CHAR(36),
       allowNull: false,
       primaryKey: true,
-      field: "id",
+      field: 'id',
     },
     userId: {
       type: DataTypes.CHAR(36),
       allowNull: false,
-      field: "user_id",
+      field: 'user_id',
     },
     hashPassword: {
       type: DataTypes.TEXT,
       allowNull: true,
-      field: "hash_password",
+      field: 'hash_password',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "created_by",
+      field: 'created_by',
     },
     createdDt: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: Sequelize.fn("current_timestamp"),
-      field: "created_dt",
+      defaultValue: new Date(),
+      field: 'created_dt',
     },
     updatedBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "updated_by",
+      field: 'updated_by',
     },
     updatedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "updated_dt",
+      field: 'updated_dt',
     },
     deletedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "deleted_dt",
+      field: 'deleted_dt',
     },
   },
   {
     sequelize,
-    tableName: "user_password",
-    modelName: "UserPassword",
-  }
+    tableName: 'user_password',
+    modelName: 'UserPassword',
+  },
 );

@@ -1,5 +1,5 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
-import { Is } from "sequelize-typescript";
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { Is } from 'sequelize-typescript';
 
 export class LoginDto {
   @IsNotEmpty()
@@ -28,10 +28,15 @@ export class RegisterDto {
   @IsNotEmpty()
   storeName: string;
 
-  constructor(email: string, password: string, fullname: string) {
+  @IsNotEmpty()
+  storyType: number;
+
+  constructor(email: string, password: string, fullname: string, storeName: string, storyType: number) {
     this.email = email;
     this.password = password;
     this.fullname = fullname;
+    this.storeName = storeName;
+    this.storyType = storyType;
   }
 }
 

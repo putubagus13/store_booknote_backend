@@ -1,5 +1,5 @@
-import { Model, DataTypes } from "sequelize";
-import { sequelize } from "@/configs/database.config";
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '@/configs/database.config';
 
 export default class Categories extends Model {
   declare id: string;
@@ -18,48 +18,48 @@ Categories.init(
       type: DataTypes.CHAR(36),
       allowNull: false,
       primaryKey: true,
-      field: "id",
+      field: 'id',
     },
     name: {
       type: DataTypes.STRING(500),
       allowNull: false,
-      field: "name",
+      field: 'name',
     },
     description: {
       type: DataTypes.STRING(500),
       allowNull: true,
-      field: "description",
+      field: 'description',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "created_by",
+      field: 'created_by',
     },
     createdDt: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.fn("current_timestamp"),
-      field: "created_dt",
+      defaultValue: new Date(),
+      field: 'created_dt',
     },
     updatedBy: {
       type: DataTypes.CHAR(36),
       allowNull: true,
-      field: "updated_by",
+      field: 'updated_by',
     },
     updatedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "updated_dt",
+      field: 'updated_dt',
     },
     deletedDt: {
       type: DataTypes.DATE(6),
       allowNull: true,
-      field: "deleted_dt",
+      field: 'deleted_dt',
     },
   },
   {
     sequelize,
-    tableName: "categories",
-    modelName: "Categories",
-  }
+    tableName: 'categories',
+    modelName: 'Categories',
+  },
 );

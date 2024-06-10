@@ -1,22 +1,13 @@
-import { sequelize } from "@/configs/database.config";
-import {
-  APP_PORT,
-  CREDENTIALS,
-  LOG_FORMAT,
-  ORIGIN,
-  STATIC_FILE_PATH,
-} from "@/configs/env.config";
-import { Routes } from "@/utils/annotations";
-import { logger, stream } from "@/utils/loggers";
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import morgan from "morgan";
-import cookieParser from "cookie-parser";
-import {
-  errorHandler,
-  notFoundHandler,
-} from "@/middlewares/error-handler.middleware";
+import { sequelize } from './src/configs/database.config';
+import { APP_PORT, CREDENTIALS, LOG_FORMAT, ORIGIN, STATIC_FILE_PATH } from './src/configs/env.config';
+import { logger, stream } from './src/utils/loggers';
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import { errorHandler, notFoundHandler } from './src/middlewares/error-handler.middleware';
+import { Routes } from './src/utils/annotations';
 
 export class App {
   public app: express.Application;
@@ -37,9 +28,9 @@ export class App {
   private async connectToDatabase() {
     try {
       await sequelize.sync({ alter: false });
-      logger.info("Database connected!");
+      logger.info('Database connected!');
     } catch (error) {
-      logger.info("Database failed to connect!");
+      logger.info('Database failed to connect!');
       logger.error(error);
     }
   }
@@ -52,7 +43,7 @@ export class App {
       helmet({
         crossOriginEmbedderPolicy: false,
         crossOriginResourcePolicy: false,
-      })
+      }),
     );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
@@ -60,17 +51,17 @@ export class App {
   }
 
   public initializeRoutes(routes: Routes[]) {
-    this.app.use("/hello", (req, res) => {
-      res.send("Backend Engage");
+    this.app.use('/hello', (req, res) => {
+      res.send('Backend Engage');
     });
 
-    this.app.use("/images", express.static(STATIC_FILE_PATH));
+    this.app.use('/images', express.static(STATIC_FILE_PATH));
 
     routes.forEach((route) => {
-      this.app.use("/", route.router);
+      this.app.use('/', route.router);
     });
 
-    this.app.use("*", notFoundHandler); // 404 handler
+    this.app.use('*', notFoundHandler); // 404 handler
     this.app.use(errorHandler); // error handler
   }
 
