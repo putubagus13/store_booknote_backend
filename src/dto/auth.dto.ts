@@ -29,14 +29,14 @@ export class RegisterDto {
   storeName: string;
 
   @IsNotEmpty()
-  storyType: number;
+  storeType: number;
 
-  constructor(email: string, password: string, fullname: string, storeName: string, storyType: number) {
+  constructor(email: string, password: string, fullname: string, storeName: string, storeType: number) {
     this.email = email;
     this.password = password;
     this.fullname = fullname;
     this.storeName = storeName;
-    this.storyType = storyType;
+    this.storeType = storeType;
   }
 }
 

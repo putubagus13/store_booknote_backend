@@ -7,15 +7,17 @@ import { HttpException } from '@/global/http-exception';
 import User from '@/models/user.model';
 import { UserPassword } from '@/models/user-password.model';
 import UserStore from '@/models/user-store.model';
-import Store from '@/models/store.model';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 import { SECRET_KEY } from '@/configs/env.config';
 import { IAuthTokenPayload } from '@/interfaces/auth.interface';
 import { WhereOptions } from 'sequelize';
+import { IRegisterTokenPayload } from '@/interfaces/otp.interface';
+import OtpService from './otp.service';
 
 @Service()
 export default class AuthService {
+  sendEmailOTPRegistService = new OtpService().sendEmailOTPRegistService;
   public authBase = async (where: WhereOptions<User>) => {
     try {
       const foundUser = await User.findOne({
@@ -30,51 +32,43 @@ export default class AuthService {
     }
   };
 
-  public register = async (dto: RegisterDto) => {
+  public register = async (res: Response, dto: RegisterDto) => {
     const foundUser = await User.findOne({ where: { email: dto.email } });
 
     if (foundUser) {
       throw new HttpException(400, 'User already exists');
     }
 
-    const userId = v4();
     const hashPassword = await bcrypt.hash(dto.password, 10);
 
-    const user = new User();
-    user.userId = userId;
-    user.email = dto.email;
-    user.fullname = dto.fullname;
+    await this.sendEmailOTPRegistService({
+      to: dto.email,
+      subject: 'OTP for register user',
+      text: 'OTP for register user',
+    });
 
-    const userPassword = new UserPassword();
-    userPassword.id = v4();
-    userPassword.userId = userId;
-    userPassword.hashPassword = hashPassword;
+    const payload: IRegisterTokenPayload = {
+      email: dto.email,
+      fullname: dto.fullname,
+      password: hashPassword,
+      storeType: dto.storeType,
+      storeName: dto.storeName,
+    };
 
-    const store = new Store();
-    store.id = v4();
-    store.name = dto.storeName;
-    store.createdBy = userId;
-    store.createdDt = new Date();
+    const token = jwt.sign(payload, SECRET_KEY, {
+      expiresIn: '1d',
+    });
 
-    const userStore = new UserStore();
-    userStore.id = v4();
-    userStore.userId = userId;
-    userStore.storeId = store.id;
-    userStore.createdDt = new Date();
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      expires: new Date(new Date().getTime() + 5 * 60000),
+    });
 
-    try {
-      await sequelize.transaction(async (t) => {
-        await user.save({ transaction: t });
-        await userPassword.save({ transaction: t });
-        await store.save({ transaction: t });
-        await userStore.save({ transaction: t });
-      });
-    } catch (error) {
-      console.error('Error in transaction:', error);
-      throw new HttpException(400, error.message);
-    }
-
-    return 'User registered';
+    return {
+      token,
+    };
   };
 
   public login = async (res: Response, dto: LoginDto) => {

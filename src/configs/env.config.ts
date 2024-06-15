@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { bool, cleanEnv, num, str } from "envalid";
+import 'dotenv/config';
+import { bool, cleanEnv, num, str } from 'envalid';
 
 export const validateEnv = () => {
   return cleanEnv(process.env, {
@@ -25,6 +25,10 @@ export const validateEnv = () => {
     STATIC_FILE_PATH: str(),
 
     SECRET_KEY: str(),
+
+    USER: str(),
+
+    PASS: str(),
   });
 };
 
@@ -41,4 +45,6 @@ export const {
   CREDENTIALS,
   STATIC_FILE_PATH,
   SECRET_KEY,
+  USER,
+  PASS,
 } = validateEnv();
