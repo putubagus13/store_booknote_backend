@@ -19,4 +19,14 @@ export default class StoreTypeController {
       next(error);
     }
   };
+
+  public getAllStoreType = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = await this.storeTypeService.getAllStoreType();
+      return this.response.Response200(res, { data });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
 }

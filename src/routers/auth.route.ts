@@ -1,11 +1,12 @@
 import AuthController from '@/controllers/auth.controller';
 import { ForgotPassword, GetUserProfile, LoginDto, RegisterDto, ResetPasswordDto } from '@/dto/auth.dto';
+import { v1 } from '@/global/api-version';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
 import { Router } from 'express';
 
 export default class AuthRoute {
-  public path = '/auth/user';
+  public path = v1 + '/auth/user';
   public router = Router();
   public authController = new AuthController();
   public authMiddleware = new AuthMiddleware();

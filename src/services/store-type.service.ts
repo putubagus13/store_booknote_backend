@@ -35,4 +35,13 @@ export default class StoreTypeService {
 
     return data.dataValues;
   };
+
+  public getAllStoreType = async () => {
+    const data = await StoreType.findAll({
+      where: { deleted_dt: null },
+      attributes: ['name', 'type'],
+    });
+
+    return data;
+  };
 }

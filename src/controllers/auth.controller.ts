@@ -17,7 +17,7 @@ export default class AuthController {
 
       if (!payload) throw new HttpException(400, 'Login failed');
 
-      return this.response.Response200(res, payload);
+      return this.response.Response200(res, { data: payload });
     } catch (error) {
       next(error);
     }
@@ -30,7 +30,7 @@ export default class AuthController {
 
       if (!payload) throw new HttpException(400, 'User not registered');
 
-      return this.response.Response200(res, payload);
+      return this.response.Response200(res, { data: payload });
     } catch (error) {
       next(error);
     }
@@ -57,7 +57,7 @@ export default class AuthController {
       const payload = await this.authService.forgotPassword(dto);
       if (!payload) throw new HttpException(400, 'User not found');
 
-      return this.response.Response200(res, { token: payload });
+      return this.response.Response200(res, { data: payload });
     } catch (error) {
       next(error);
     }
