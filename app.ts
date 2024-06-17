@@ -1,5 +1,5 @@
 import { sequelize } from './src/configs/database.config';
-import { APP_PORT, CREDENTIALS, LOG_FORMAT, ORIGIN, STATIC_FILE_PATH } from './src/configs/env.config';
+import { APP_PORT, CREDENTIALS, LOG_FORMAT, ORIGIN, STATIC_FILE_PATH_PRODUCT, STATIC_FILE_PATH_USER } from './src/configs/env.config';
 import { logger, stream } from './src/utils/loggers';
 import express from 'express';
 import helmet from 'helmet';
@@ -55,7 +55,8 @@ export class App {
       res.send('Backend Engage');
     });
 
-    this.app.use('/images', express.static(STATIC_FILE_PATH));
+    this.app.use('/images/users', express.static(STATIC_FILE_PATH_USER));
+    this.app.use('/images/product', express.static(STATIC_FILE_PATH_PRODUCT));
 
     routes.forEach((route) => {
       this.app.use('/', route.router);

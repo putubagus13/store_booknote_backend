@@ -22,7 +22,11 @@ export const validateEnv = () => {
     CREDENTIALS: bool(),
 
     //STATIC FILE PATH
-    STATIC_FILE_PATH: str(),
+    STATIC_FILE_PATH_USER: str(),
+
+    STATIC_FILE_PATH_PRODUCT: str(),
+
+    STATIC_FILE_URL: str(),
 
     SECRET_KEY: str(),
 
@@ -43,8 +47,10 @@ export const {
   LOG_FORMAT,
   ORIGIN,
   CREDENTIALS,
-  STATIC_FILE_PATH,
+  STATIC_FILE_PATH_USER,
+  STATIC_FILE_PATH_PRODUCT,
   SECRET_KEY,
   USER,
   PASS,
+  STATIC_FILE_URL,
 } = validateEnv();

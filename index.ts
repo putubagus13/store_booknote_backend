@@ -4,8 +4,9 @@ import AuthRoute from './src/routers/auth.route';
 import StoreTypeRoute from './src/routers/store-type.router';
 import { App } from './app';
 import OtpRouter from '@/routers/otp.router';
+import UploadRouter from '@/routers/upload.router';
 
 validateEnv();
 
-const app = new App([new AuthRoute(), new StoreTypeRoute(), new OtpRouter()]);
+const app = new App([new AuthRoute(), new StoreTypeRoute(), new OtpRouter(), new UploadRouter()]);
 app.listen();
