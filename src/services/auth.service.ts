@@ -14,6 +14,8 @@ import { IAuthTokenPayload } from '@/interfaces/auth.interface';
 import { WhereOptions } from 'sequelize';
 import { IRegisterTokenPayload } from '@/interfaces/otp.interface';
 import OtpService from './otp.service';
+import Store from '@/models/store.model';
+import StoreType from '@/models/store-type.model';
 
 @Service()
 export default class AuthService {
@@ -117,7 +119,30 @@ export default class AuthService {
 
   public getUserProfile = async (session: IAuthTokenPayload) => {
     const user = await this.authBase({ userId: session.userId });
-    return user;
+    const userStore = await UserStore.findOne({
+      where: {
+        userId: session.userId,
+        deletedDt: null,
+      },
+    });
+    const store = await Store.findOne({
+      where: {
+        id: userStore.storeId,
+        deletedDt: null,
+      },
+    });
+    const storeType = await StoreType.findOne({
+      where: {
+        type: store.storeType,
+        deletedDt: null,
+      },
+    });
+    return {
+      ...user.dataValues,
+      ...userStore.dataValues,
+      ...store.dataValues,
+      storeTypeName: storeType.name,
+    };
   };
 
   public forgotPassword = async ({ email }: ForgotPassword) => {
