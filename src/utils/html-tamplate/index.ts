@@ -4,6 +4,11 @@ interface IEmailOtpRegisterTemplate {
   codeOtp: string;
 }
 
+interface IEmailResetPasswordTemplate {
+  recipient: string;
+  token: string;
+}
+
 export const sendOtpEmailTampalte = ({ message, recipient, codeOtp }: IEmailOtpRegisterTemplate) => `
    <!DOCTYPE html>
     <html lang="en">
@@ -46,6 +51,53 @@ export const sendOtpEmailTampalte = ({ message, recipient, codeOtp }: IEmailOtpR
             <p>Please use this code to complete your registration. This code is valid for 5 minutes, so make sure to use it as soon as possible.</p>
             <p>Thank you for registering!</p>
         </div>
+    </body>
+    </html>
+`;
+
+export const sendEmailResetPasswordTemplate = ({ recipient, token }: IEmailResetPasswordTemplate) => `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+        rel="stylesheet"
+        />
+        <title>Your Request Reset Password</title>
+        <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            width: 100%;
+            height: 100vh;
+            color: black;
+        }
+        </style>
+    </head>
+    <body>
+        <h2>Request Reset password</h2>
+        <p>
+        Hi <span style="font-weight: 600">${recipient}</span>! For reset your password
+        please click the button below!
+        </p>
+        <a
+        href="http://localhost:4000/auth/reset-password?token=${token}"
+        style="
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        "
+        >Reset Password</a
+        >
     </body>
     </html>
 `;

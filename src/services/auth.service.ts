@@ -16,6 +16,7 @@ import { IRegisterTokenPayload } from '@/interfaces/otp.interface';
 import OtpService from './otp.service';
 import Store from '@/models/store.model';
 import StoreType from '@/models/store-type.model';
+import { sendEmail } from '@/utils/generals/general.function';
 
 @Service()
 export default class AuthService {
@@ -170,6 +171,13 @@ export default class AuthService {
 
     const token = jwt.sign(payload, SECRET_KEY, {
       expiresIn: '1d',
+    });
+
+    await sendEmail({
+      to: foundUser.email,
+      subject: 'no-reply',
+      text: 'Request Reset Password',
+      token,
     });
 
     return token;
