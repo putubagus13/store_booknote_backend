@@ -4,6 +4,12 @@ export default class UpdateProfileDto {
   @IsOptional()
   imageUrl: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   fullname: string;
+
+  @IsOptional()
+  oldPassword: string;
+
+  @IsOptional()
+  newPassword: string;
 }
