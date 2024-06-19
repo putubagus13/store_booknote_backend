@@ -1,11 +1,10 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@/configs/database.config';
 
-export default class Categories extends Model {
+export default class ProductCategory extends Model {
   declare id: string;
-  declare storeType: number;
-  declare name: string;
-  declare description?: string;
+  declare productId: string;
+  declare categoryId: string;
   declare createdBy?: string;
   declare createdDt?: Date;
   declare updatedBy?: string;
@@ -13,7 +12,7 @@ export default class Categories extends Model {
   declare deletedDt?: Date;
 }
 
-Categories.init(
+ProductCategory.init(
   {
     id: {
       type: DataTypes.CHAR(36),
@@ -21,20 +20,15 @@ Categories.init(
       primaryKey: true,
       field: 'id',
     },
-    storeType: {
-      type: DataTypes.INTEGER,
+    productId: {
+      type: DataTypes.CHAR(36),
       allowNull: false,
-      field: 'store_type',
+      field: 'product_id',
     },
-    name: {
-      type: DataTypes.STRING(500),
+    categoryId: {
+      type: DataTypes.CHAR(36),
       allowNull: false,
-      field: 'name',
-    },
-    description: {
-      type: DataTypes.STRING(500),
-      allowNull: true,
-      field: 'description',
+      field: 'category_id',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
@@ -65,7 +59,7 @@ Categories.init(
   },
   {
     sequelize,
-    tableName: 'categories',
-    modelName: 'Categories',
+    tableName: 'product_category',
+    modelName: 'ProductCategory',
   },
 );

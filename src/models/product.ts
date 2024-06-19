@@ -1,30 +1,29 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@/configs/database.config';
 
-export default class Categories extends Model {
+export default class Product extends Model {
   declare id: string;
-  declare storeType: number;
   declare name: string;
   declare description?: string;
+  declare price: number;
+  declare imageUrl: string;
+  declare stock: number;
+  declare storeId: string;
   declare createdBy?: string;
   declare createdDt?: Date;
   declare updatedBy?: string;
   declare updatedDt?: Date;
   declare deletedDt?: Date;
+  declare dataStatus?: Date;
 }
 
-Categories.init(
+Product.init(
   {
     id: {
       type: DataTypes.CHAR(36),
       allowNull: false,
       primaryKey: true,
       field: 'id',
-    },
-    storeType: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'store_type',
     },
     name: {
       type: DataTypes.STRING(500),
@@ -35,6 +34,26 @@ Categories.init(
       type: DataTypes.STRING(500),
       allowNull: true,
       field: 'description',
+    },
+    imageUrl: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      field: 'image_url',
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'price',
+    },
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'stock',
+    },
+    storeId: {
+      type: DataTypes.CHAR(36),
+      allowNull: false,
+      field: 'store_id',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
@@ -62,10 +81,15 @@ Categories.init(
       allowNull: true,
       field: 'deleted_dt',
     },
+    dataStatus: {
+      type: DataTypes.DATE(6),
+      allowNull: true,
+      field: 'data_status',
+    },
   },
   {
     sequelize,
-    tableName: 'categories',
-    modelName: 'Categories',
+    tableName: 'product',
+    modelName: 'Product',
   },
 );

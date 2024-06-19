@@ -6,8 +6,9 @@ import { App } from './app';
 import OtpRouter from '@/routers/otp.router';
 import UploadRouter from '@/routers/upload.router';
 import UserRouter from '@/routers/user.router';
+import ProductRouter from '@/routers/product.router';
 
 validateEnv();
 
-const app = new App([new AuthRoute(), new StoreTypeRoute(), new OtpRouter(), new UploadRouter(), new UserRouter()]);
+const app = new App([new AuthRoute(), new StoreTypeRoute(), new OtpRouter(), new UploadRouter(), new UserRouter(), new ProductRouter()]);
 app.listen();
