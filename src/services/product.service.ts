@@ -1,14 +1,18 @@
 import { sequelize } from '@/configs/database.config';
-import { CreateProductDto, UpdateProductDto } from '@/dto/product.dto';
+import { CreateProductDto, GetProductDto, UpdateProductDto } from '@/dto/product.dto';
 import UpdateProfileDto from '@/dto/user.dto';
 import { HttpException } from '@/global/http-exception';
 import { IAuthTokenPayload } from '@/interfaces/auth.interface';
 import Product from '@/models/product';
 import ProductCategory from '@/models/product-category.model';
 import ProductHistory from '@/models/product-history.model';
+import ProductTransaction from '@/models/product-transaction';
 import Store from '@/models/store.model';
 import { ProductStatusHistory } from '@/utils/enums';
+import { pagination } from '@/utils/generals/general.function';
+import { ResponsePagination } from '@/utils/generals/generel.model';
 import { logger } from '@/utils/loggers';
+import { QueryTypes } from 'sequelize';
 import { Service } from 'typedi';
 import { v4 } from 'uuid';
 
@@ -152,5 +156,58 @@ export default class ProductService {
       logger.error(error.message);
       throw new HttpException(400, error.message);
     }
+  };
+
+  public getAllProduct = async (storeId: string, dto: GetProductDto) => {
+    const { page, limit, search, categoryIds, sort, order } = dto;
+    const { sorting, offset } = pagination({ page, limit, sort, order });
+    // const categoryId = categoryIds ? categoryIds.split(',') : [];
+
+    const products = await sequelize.query(
+      `
+        select
+          p.id,
+          p.name,
+          p.price,
+          p.stock,
+          p.image_url as imageUrl,
+          p.created_dt as createdDt,
+          sum(pt.amount) as totalSold
+        from product p
+        left join product_transaction pt on p.id = pt.product_id
+        where 
+          p.deleted_dt is null
+          and p.store_id = '${storeId}'
+          and p.name like '%${search}%'
+          group by p.id
+        order by ${sorting}
+        limit ${limit || 10} offset ${offset}
+      `,
+      { type: QueryTypes.SELECT },
+    );
+
+    const totalDataProduct: any = await sequelize.query(
+      `
+        select
+          count(distinct p.id) as totalData
+        from product p
+        where 
+          p.deleted_dt is null
+          and p.store_id = '${storeId}'
+          and p.name like '%${search}%'
+      `,
+      { type: QueryTypes.SELECT },
+    );
+
+    const totalPage = Math.ceil(totalDataProduct[0].totalData / (limit || 10));
+    const totalData = totalDataProduct.length;
+
+    const payload = new ResponsePagination();
+    payload.items = products;
+    payload.totalPage = totalPage;
+    payload.totalData = totalData;
+    payload.currentPage = Number(page) || 1;
+
+    return payload;
   };
 }

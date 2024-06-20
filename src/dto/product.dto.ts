@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -44,4 +44,27 @@ export class UpdateProductDto {
   @IsNotEmpty()
   @IsString()
   imageUrl: string;
+}
+
+export class GetProductDto {
+  @IsOptional()
+  page: number;
+
+  @IsOptional()
+  limit: number;
+
+  @IsOptional()
+  search: string;
+
+  @IsOptional()
+  categoryIds: string;
+
+  @IsOptional()
+  sort: string;
+
+  @IsOptional()
+  order: string;
+
+  @IsOptional()
+  status: string;
 }

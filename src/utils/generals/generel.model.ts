@@ -3,3 +3,10 @@ export class PayloadSendEmail {
   subject: string;
   text: string;
 }
+
+export class ResponsePagination {
+  totalPage: number;
+  totalData: number;
+  currentPage: number;
+  items: any[];
+}

@@ -1,5 +1,5 @@
 import ProductController from '@/controllers/product.controller';
-import { CreateProductDto, UpdateProductDto } from '@/dto/product.dto';
+import { CreateProductDto, GetProductDto, UpdateProductDto } from '@/dto/product.dto';
 import { v1 } from '@/global/api-version';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
@@ -22,6 +22,12 @@ export default class ProductRouter {
       this.authMiddleware.Authenticated,
       ValidationMiddleware('body', UpdateProductDto),
       this.productController.updateProduct,
+    );
+    this.router.get(
+      this.path + '/:storeId',
+      this.authMiddleware.Authenticated,
+      ValidationMiddleware('query', GetProductDto),
+      this.productController.getAllProduct,
     );
   }
 }

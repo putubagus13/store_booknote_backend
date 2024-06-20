@@ -12,6 +12,14 @@ interface ISendEmailPayload {
   token: string;
 }
 
+interface IPayloadPagination {
+  page: number;
+  limit: number;
+  sort: string;
+  order: string;
+  sortDefault?: string;
+}
+
 export const useOtpGenerated = () => {
   return generatedOtp.generate(4, {
     digits: true,
@@ -50,4 +58,11 @@ export const sendEmail = async ({ to, subject, text, token }: ISendEmailPayload)
     .catch((error) => {
       logger.error('Error occurred: %s', error.message), console.log(error);
     });
+};
+
+export const pagination = (payload: IPayloadPagination) => {
+  const offset = ((payload.page || 1) - 1) * (payload.limit || 10);
+  const sorting = payload.sort ? `${payload.sort} ${payload.order}` : `${payload.sortDefault || 'createdDt'} desc`;
+
+  return { offset, sorting };
 };

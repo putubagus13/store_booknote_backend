@@ -1,4 +1,4 @@
-import { CreateProductDto } from '@/dto/product.dto';
+import { CreateProductDto, GetProductDto } from '@/dto/product.dto';
 import { ResponseSuccess } from '@/global/response';
 import { IAuthTokenPayload } from '@/interfaces/auth.interface';
 import ProductService from '@/services/product.service';
@@ -31,6 +31,18 @@ export default class ProductController {
 
       await this.productService.updateProduct(session, body, productId);
       return this.response.Response200(res);
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  };
+
+  public getAllProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { storeId } = req.params;
+      const query = req.query as unknown as GetProductDto;
+      const data = await this.productService.getAllProduct(storeId, query);
+      return this.response.Response200(res, { data: data });
     } catch (error) {
       logger.error(error);
       next(error);
