@@ -12,3 +12,8 @@ export enum ProductStatusHistory {
   UPDATE_STOCK_PRICE = 'UPDATE_STOCK_PRICE',
   DELETE = 'DELETE',
 }
+
+export enum JournalStatus {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+}

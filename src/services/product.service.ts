@@ -19,7 +19,8 @@ import { v4 } from 'uuid';
 @Service()
 export default class ProductService {
   public createProduct = async (session: IAuthTokenPayload, dto: CreateProductDto) => {
-    const { stock, price, productName, imageUrl, storeId, categoryIds } = dto;
+    const { stock, price, productName, imageUrl, storeId, categoryIds, unit } = dto;
+    const categoryIdSplit = categoryIds ? categoryIds.split(',') : [];
 
     const foundStore = await Store.findByPk(storeId);
     if (!foundStore) {
@@ -36,6 +37,7 @@ export default class ProductService {
             price,
             stock,
             storeId,
+            unit: unit,
             createdBy: session.userId,
             imageUrl,
             createdDt: new Date(),
@@ -56,8 +58,8 @@ export default class ProductService {
           { transaction: t },
         );
 
-        if (categoryIds.length > 0) {
-          for (const categoryId of categoryIds) {
+        if (categoryIdSplit.length > 0) {
+          for (const categoryId of categoryIdSplit) {
             await ProductCategory.create(
               {
                 id: v4(),
@@ -78,7 +80,8 @@ export default class ProductService {
   };
 
   public updateProduct = async (session: IAuthTokenPayload, dto: UpdateProductDto, productId: string) => {
-    const { productName, price, stock, categoryIds, imageUrl } = dto;
+    const { productName, price, stock, categoryIds, imageUrl, unit } = dto;
+    const categoryIdSplit = categoryIds ? categoryIds.split(',') : [];
 
     const foundProduct = await Product.findOne({
       where: { id: productId, deletedDt: null },
@@ -90,13 +93,13 @@ export default class ProductService {
 
     try {
       await sequelize.transaction(async (t) => {
-        if (categoryIds.length > 0) {
+        if (categoryIdSplit.length > 0) {
           await ProductCategory.destroy({
             where: { productId: productId },
             transaction: t,
           });
 
-          for (const categoryId of categoryIds) {
+          for (const categoryId of categoryIdSplit) {
             await ProductCategory.create(
               {
                 id: v4(),
@@ -150,6 +153,7 @@ export default class ProductService {
         foundProduct.updatedBy = session.userId;
         foundProduct.updatedDt = new Date();
         foundProduct.imageUrl = imageUrl || foundProduct.imageUrl;
+        foundProduct.unit = unit || foundProduct.unit;
         await foundProduct.save({ transaction: t });
       });
     } catch (error) {
@@ -179,6 +183,7 @@ export default class ProductService {
           p.deleted_dt is null
           and p.store_id = '${storeId}'
           and p.name like '%${search}%'
+          and p.data_status is null
           group by p.id
         order by ${sorting}
         limit ${limit || 10} offset ${offset}
@@ -209,5 +214,15 @@ export default class ProductService {
     payload.currentPage = Number(page) || 1;
 
     return payload;
+  };
+
+  public deActiveProduct = async (productId: string) => {
+    const foundProduct = await Product.findByPk(productId || '00000000-0000-0000-0000-000000000000');
+    if (!foundProduct) {
+      throw new HttpException(404, 'product not found');
+    }
+
+    foundProduct.dataStatus = new Date();
+    await foundProduct.save();
   };
 }

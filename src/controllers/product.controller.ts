@@ -48,4 +48,15 @@ export default class ProductController {
       next(error);
     }
   };
+
+  public deActiveProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { productId } = req.params;
+      const data = await this.productService.deActiveProduct(productId);
+      return this.response.Response200(res);
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  };
 }

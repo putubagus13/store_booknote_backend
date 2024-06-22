@@ -14,7 +14,12 @@ export class CreateProductDto {
   stock: number;
 
   @IsNotEmpty()
-  categoryIds: string[];
+  @IsString()
+  categoryIds: string;
+
+  @IsNotEmpty()
+  @IsString()
+  unit: string;
 
   @IsNotEmpty()
   @IsUUID()
@@ -39,7 +44,12 @@ export class UpdateProductDto {
   stock: number;
 
   @IsNotEmpty()
-  categoryIds: string[];
+  @IsString()
+  categoryIds: string;
+
+  @IsNotEmpty()
+  @IsString()
+  unit: string;
 
   @IsNotEmpty()
   @IsString()

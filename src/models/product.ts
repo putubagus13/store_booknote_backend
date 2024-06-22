@@ -8,6 +8,7 @@ export default class Product extends Model {
   declare price: number;
   declare imageUrl: string;
   declare stock: number;
+  declare unit: string;
   declare storeId: string;
   declare createdBy?: string;
   declare createdDt?: Date;
@@ -49,6 +50,11 @@ Product.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       field: 'stock',
+    },
+    unit: {
+      type: DataTypes.CHAR(50),
+      allowNull: false,
+      field: 'unit',
     },
     storeId: {
       type: DataTypes.CHAR(36),
