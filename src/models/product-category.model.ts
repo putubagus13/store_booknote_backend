@@ -1,7 +1,10 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@/configs/database.config';
+import Product from './product';
+import Categories from './categories.model';
+import Category from './categories.model';
 
-export default class ProductCategory extends Model {
+class ProductCategory extends Model {
   declare id: string;
   declare productId: string;
   declare categoryId: string;
@@ -63,3 +66,5 @@ ProductCategory.init(
     modelName: 'ProductCategory',
   },
 );
+
+export default ProductCategory;

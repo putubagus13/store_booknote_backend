@@ -29,6 +29,7 @@ export default class ProductRouter {
       ValidationMiddleware('query', GetProductDto),
       this.productController.getAllProduct,
     );
+    this.router.get(this.path + '/detail/:productId', this.authMiddleware.Authenticated, this.productController.getDetailProduct);
     this.router.delete(this.path + '/:productId', this.authMiddleware.Authenticated, this.productController.deActiveProduct);
   }
 }

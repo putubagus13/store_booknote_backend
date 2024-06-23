@@ -59,4 +59,15 @@ export default class ProductController {
       next(error);
     }
   };
+
+  public getDetailProduct = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { productId } = req.params;
+      const data = await this.productService.getDetailProduct(productId);
+      return this.response.Response200(res, { data });
+    } catch (error) {
+      logger.error(error);
+      next(error);
+    }
+  };
 }

@@ -165,8 +165,7 @@ export default class ProductService {
   public getAllProduct = async (storeId: string, dto: GetProductDto) => {
     const { page, limit, search, categoryIds, sort, order } = dto;
     const { sorting, offset } = pagination({ page, limit, sort, order });
-    // const categoryId = categoryIds ? categoryIds.split(',') : [];
-
+    const categoryIdArray = categoryIds ? categoryIds.split(',').map((item) => `'${item}'`) : [];
     const products = await sequelize.query(
       `
         select
@@ -179,11 +178,13 @@ export default class ProductService {
           sum(pt.amount) as totalSold
         from product p
         left join product_transaction pt on p.id = pt.product_id
+        left join product_category pc on pc.product_id = p.id
         where 
           p.deleted_dt is null
           and p.store_id = '${storeId}'
           and p.name like '%${search}%'
           and p.data_status is null
+          ${categoryIdArray.length ? `and pc.category_id in (${categoryIdArray})` : ''}
           group by p.id
         order by ${sorting}
         limit ${limit || 10} offset ${offset}
@@ -224,5 +225,32 @@ export default class ProductService {
 
     foundProduct.dataStatus = new Date();
     await foundProduct.save();
+  };
+
+  public getDetailProduct = async (productId: string) => {
+    const foundProduct = await Product.findOne({
+      where: { id: productId, dataStatus: null },
+      attributes: ['id', 'imageUrl', 'price', 'stock', 'unit', 'name'],
+    });
+
+    if (!foundProduct) throw new HttpException(404, 'Product not found');
+
+    const foundProductCategories = await sequelize.query(
+      `
+        select
+          c.id as value,
+          c.name as label
+        from categories c
+        join product_category pc on c.id = pc.category_id
+        where pc.deleted_dt is null
+        and pc.product_id = '${productId}'
+      `,
+      { type: QueryTypes.SELECT },
+    );
+
+    return {
+      ...foundProduct.dataValues,
+      productCategories: foundProductCategories,
+    };
   };
 }
