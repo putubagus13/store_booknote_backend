@@ -1,7 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '@/configs/database.config';
-
-export default class Categories extends Model {
+import ProductCategory from './product-category.model';
+import Product from './product';
+class Category extends Model {
   declare id: string;
   declare storeType: number;
   declare name: string;
@@ -13,7 +14,7 @@ export default class Categories extends Model {
   declare deletedDt?: Date;
 }
 
-Categories.init(
+Category.init(
   {
     id: {
       type: DataTypes.CHAR(36),
@@ -66,6 +67,8 @@ Categories.init(
   {
     sequelize,
     tableName: 'categories',
-    modelName: 'Categories',
+    modelName: 'Category',
   },
 );
+
+export default Category;
