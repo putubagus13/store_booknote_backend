@@ -4,6 +4,8 @@ import { sequelize } from '@/configs/database.config';
 export default class ProductTransaction extends Model {
   declare id: string;
   declare productId: string;
+  declare storeId: string;
+  declare paymentMethod: string;
   declare amount: number;
   declare productQuantity: number;
   declare createdBy?: string;
@@ -25,6 +27,16 @@ ProductTransaction.init(
       type: DataTypes.CHAR(36),
       allowNull: false,
       field: 'product_id',
+    },
+    storeId: {
+      type: DataTypes.CHAR(36),
+      allowNull: false,
+      field: 'store_id',
+    },
+    paymentMethod: {
+      type: DataTypes.CHAR(50),
+      allowNull: false,
+      field: 'payment_method',
     },
     amount: {
       type: DataTypes.INTEGER,

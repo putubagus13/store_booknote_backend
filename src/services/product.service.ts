@@ -175,7 +175,7 @@ export default class ProductService {
           p.stock,
           p.image_url as imageUrl,
           p.created_dt as createdDt,
-          sum(pt.amount) as totalSold
+          sum(distinct pt.product_quantity) as totalSold
         from product p
         left join product_transaction pt on p.id = pt.product_id
         left join product_category pc on pc.product_id = p.id
