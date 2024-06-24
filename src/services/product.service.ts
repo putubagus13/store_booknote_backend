@@ -175,9 +175,16 @@ export default class ProductService {
           p.stock,
           p.image_url as imageUrl,
           p.created_dt as createdDt,
-          sum(distinct pt.product_quantity) as totalSold
+          subQuery.totalSold
         from product p
-        left join product_transaction pt on p.id = pt.product_id
+        left join (
+          select
+            pt.product_id,
+            sum(pt.product_quantity) as totalSold
+          from product_transaction pt
+          where pt.deleted_dt is null
+          group by pt.product_id
+        ) as subQuery on subQuery.product_id = p.id
         left join product_category pc on pc.product_id = p.id
         where 
           p.deleted_dt is null
