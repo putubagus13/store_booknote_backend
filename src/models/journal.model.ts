@@ -7,6 +7,7 @@ export default class Journal extends Model {
   declare amount: number;
   declare storeId: string;
   declare description?: string;
+  declare code: string;
   declare createdBy?: string;
   declare createdDt?: Date;
   declare updatedBy?: string;
@@ -41,6 +42,11 @@ Journal.init(
       type: DataTypes.STRING,
       allowNull: true,
       field: 'description',
+    },
+    code: {
+      type: DataTypes.CHAR(15),
+      allowNull: false,
+      field: 'code',
     },
     createdBy: {
       type: DataTypes.CHAR(36),

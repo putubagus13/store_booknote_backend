@@ -8,6 +8,7 @@ export default class ProductTransaction extends Model {
   declare paymentMethod: string;
   declare amount: number;
   declare productQuantity: number;
+  declare code: string;
   declare createdBy?: string;
   declare createdDt?: Date;
   declare updatedBy?: string;
@@ -47,6 +48,11 @@ ProductTransaction.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       field: 'product_quantity',
+    },
+    code: {
+      type: DataTypes.CHAR(15),
+      allowNull: false,
+      field: 'code',
     },
     createdBy: {
       type: DataTypes.CHAR(36),
