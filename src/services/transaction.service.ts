@@ -10,6 +10,7 @@ import { JournalStatus } from '@/utils/enums';
 import { logger } from '@/utils/loggers';
 import { Service } from 'typedi';
 import { v4 } from 'uuid';
+import generatedOtp from 'otp-generator';
 
 @Service()
 export default class TransactionService {
@@ -38,6 +39,15 @@ export default class TransactionService {
 
     try {
       await sequelize.transaction(async (t) => {
+        const codeInvoice =
+          'INV' +
+          generatedOtp.generate(10, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: true,
+            specialChars: false,
+          });
+
         await ProductTransaction.create(
           {
             id: v4(),
@@ -46,6 +56,7 @@ export default class TransactionService {
             storeId,
             paymentMethod,
             productQuantity,
+            code: codeInvoice,
             createdDt: new Date(),
             createdBy: userId,
           },
@@ -58,6 +69,7 @@ export default class TransactionService {
             storeId,
             productId,
             amount,
+            code: codeInvoice,
             status: JournalStatus.DEBIT,
             createdDt: new Date(),
             createdBy: userId,
