@@ -78,3 +78,32 @@ export class GetProductDto {
   @IsOptional()
   status: string;
 }
+
+export class GetProductHistoryDto {
+  @IsOptional()
+  page: number;
+
+  @IsOptional()
+  limit: number;
+
+  @IsOptional()
+  search: string;
+
+  @IsOptional()
+  categoryIds: string;
+
+  @IsOptional()
+  sort: string;
+
+  @IsOptional()
+  order: string;
+
+  @IsOptional()
+  status: string;
+
+  @IsOptional()
+  startDate: string;
+
+  @IsOptional()
+  endDate: string;
+}
