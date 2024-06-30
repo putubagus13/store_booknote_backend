@@ -62,23 +62,23 @@ export default class JournalService {
     const { monthTimeFrame } = dto;
 
     // Calculate start and end dates for the current month
-    const startOfMonth = monthTimeFrame ? moment(monthTimeFrame).startOf('month').toDate() : moment().startOf('month').toDate();
-    const endOfMonth = monthTimeFrame ? moment(monthTimeFrame).endOf('month').toDate() : moment().endOf('month').toDate();
+    const startOfMonth = monthTimeFrame ? moment(monthTimeFrame).startOf('month').add(7, 'hour').toDate() : moment().startOf('month').add(7, 'hour').toDate();
+    const endOfMonth = monthTimeFrame ? moment(monthTimeFrame).endOf('month').add(7, 'hour').toDate() : moment().endOf('month').add(7, 'hour').toDate();
 
     // Calculate start and end dates for the previous month
     const startOfPreviousMonth = monthTimeFrame
-      ? moment(monthTimeFrame).subtract(1, 'month').startOf('month').toDate()
-      : moment().subtract(1, 'month').startOf('month').toDate();
+      ? moment(monthTimeFrame).subtract(1, 'month').startOf('month').add(7, 'hour').toDate()
+      : moment().subtract(1, 'month').startOf('month').add(7, 'hour').toDate();
     const endOfPreviousMonth = monthTimeFrame
-      ? moment(monthTimeFrame).subtract(1, 'month').endOf('month').toDate()
-      : moment().subtract(1, 'month').endOf('month').toDate();
+      ? moment(monthTimeFrame).subtract(1, 'month').endOf('month').add(7, 'hour').toDate()
+      : moment().subtract(1, 'month').endOf('month').add(7, 'hour').toDate();
 
     // Fetch income and expenses for the current month
     const currentMonthEntries = await Journal.findAll({
       where: {
         storeId,
         createdDt: {
-          [Op.gte]: startOfMonth,
+          [Op.gt]: startOfMonth,
           [Op.lte]: endOfMonth,
         },
       },
@@ -89,7 +89,7 @@ export default class JournalService {
       where: {
         storeId,
         createdDt: {
-          [Op.gte]: startOfPreviousMonth,
+          [Op.gt]: startOfPreviousMonth,
           [Op.lte]: endOfPreviousMonth,
         },
       },
@@ -147,8 +147,12 @@ export default class JournalService {
 
     const search = dto.search ? `%${dto.search}%` : '%';
 
-    const startOfMonth = monthTimeFrame ? moment(monthTimeFrame).startOf('month').format('YYYY-MM-DD') : moment().startOf('month').format('YYYY-MM-DD');
-    const endOfMonth = monthTimeFrame ? moment(monthTimeFrame).endOf('month').format('YYYY-MM-DD') : moment().endOf('month').format('YYYY-MM-DD');
+    const startOfMonth = monthTimeFrame
+      ? moment(monthTimeFrame).startOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().startOf('month').add(7, 'hour').format('YYYY-MM-DD');
+    const endOfMonth = monthTimeFrame
+      ? moment(monthTimeFrame).endOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().endOf('month').add(7, 'hour').format('YYYY-MM-DD');
 
     const queryData = `
       select
@@ -162,7 +166,7 @@ export default class JournalService {
       from journal j
       join user u on u.user_id = j.created_by
       where j.store_id = '${storeId}'
-      and j.created_dt between '${startOfMonth}' and '${endOfMonth}'
+      and j.created_dt between '${startOfMonth}' and '${endOfMonth} + interval 1 day'
       and u.fullname like '${search}'
       group by j.id
       order by ${sorting}
@@ -177,7 +181,7 @@ export default class JournalService {
       from journal j
       join user u on u.user_id = j.created_by
       where j.store_id = '${storeId}'
-      and j.created_dt between '${startOfMonth}' and '${endOfMonth}'
+      and j.created_dt between '${startOfMonth}' and '${endOfMonth} + interval 1 day'
       and u.fullname like '${search}'
       group by j.id
     `;
