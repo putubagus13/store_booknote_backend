@@ -4,6 +4,7 @@ import { PASS } from '@/configs/env.config';
 import { logger } from '../loggers';
 import { sendEmailResetPasswordTemplate } from '../html-tamplate';
 import User from '@/models/user.model';
+import ProductTransaction from '@/models/product-transaction';
 
 interface ISendEmailPayload {
   to: string;
@@ -65,4 +66,24 @@ export const pagination = (payload: IPayloadPagination) => {
   const sorting = payload.sort ? `${payload.sort} ${payload.order}` : `${payload.sortDefault || 'createdDt'} desc`;
 
   return { offset, sorting };
+};
+
+export const calculateGrowPercent = (thisMonth: ProductTransaction[], lastMonth: ProductTransaction[]) => {
+  const totalThisMonth = thisMonth.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalLastMonth = lastMonth.reduce((acc, curr) => acc + curr.amount, 0);
+
+  if (totalLastMonth === 0) return ((totalThisMonth - totalLastMonth) / 1).toFixed(2) + '%';
+
+  const result = ((totalThisMonth - totalLastMonth) / totalLastMonth) * 100;
+  return result.toFixed(2) + '%';
+};
+
+export const calculateGrowPercentThisWeek = (thisWeek: ProductTransaction[], lastWeek: ProductTransaction[]) => {
+  const totalThisWeek = thisWeek.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalLastWeek = lastWeek.reduce((acc, curr) => acc + curr.amount, 0);
+
+  if (totalLastWeek === 0) return ((totalThisWeek - totalLastWeek) / 1).toFixed(2) + '%';
+
+  const result = ((totalThisWeek - totalLastWeek) / totalLastWeek) * 100;
+  return result.toFixed(2) + '%';
 };

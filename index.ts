@@ -10,6 +10,7 @@ import ProductRouter from '@/routers/product.router';
 import JournalRouter from '@/routers/journal.router';
 import CategoriesRouter from '@/routers/categories.router';
 import TransactionRouter from '@/routers/transaction.router';
+import AnalitycRouter from '@/routers/analityc.router';
 
 validateEnv();
 
@@ -23,5 +24,6 @@ const app = new App([
   new JournalRouter(),
   new CategoriesRouter(),
   new TransactionRouter(),
+  new AnalitycRouter(),
 ]);
 app.listen();
