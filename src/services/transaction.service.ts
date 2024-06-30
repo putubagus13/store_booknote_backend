@@ -109,6 +109,7 @@ export default class TransactionService {
         pt.product_quantity as productQuantity,
         pt.payment_method as paymentMethod,
         pt.code,
+        pt.product_id as productId,
         pt.created_dt as createdDt 
       from product_transaction pt 
       join product p on p.id = pt.product_id
