@@ -43,9 +43,6 @@ export default class AnalitycService {
     const startDateThisWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[0]).toDate() : moment().startOf('week').toDate();
     const endDateThisWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[1]).toDate() : moment().endOf('week').toDate();
 
-    console.log(startDateThisWeek);
-    console.log(endDateThisWeek);
-
     const productTransactionThisWeek = await ProductTransaction.findAll({
       where: {
         storeId,
@@ -61,9 +58,6 @@ export default class AnalitycService {
       : moment().startOf('week').subtract(2, 'week').toDate();
     const endDateLastWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[0]).toDate() : moment().startOf('week').subtract(1, 'week').toDate();
 
-    console.log(startDateLastWeek);
-    console.log(endDateLastWeek);
-
     const productTransactionLastWeek = await ProductTransaction.findAll({
       where: {
         storeId,
@@ -74,18 +68,6 @@ export default class AnalitycService {
       },
     });
     const growPercentThisWeek = calculateGrowPercentThisWeek(productTransactionThisWeek, productTransactionLastWeek);
-
-    // const topProductThisMonth = await ProductTransaction.findAll({
-    //   where: {
-    //     storeId,
-    //     createdAt: {
-    //       [Op.gte]: moment().startOf('month').toDate(),
-    //     },
-    //   },
-    //   group: ['productId'],
-    //   attributes: ['productId', [sequelize.fn('sum', sequelize.col('amount')), 'total']],
-    //   order: [[sequelize.literal('total'), 'DESC']],
-    // });
 
     return {
       growPercentThisMonth,

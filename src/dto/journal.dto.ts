@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class JournalSaldoDto {
   @IsNotEmpty()
@@ -17,4 +17,32 @@ export class CreditTransactionDto {
 
   @IsNotEmpty()
   description: string;
+}
+
+export class TimeframeDto {
+  @IsOptional()
+  monthTimeFrame: string;
+}
+
+export class GetListJournalDto {
+  @IsOptional()
+  page: number;
+
+  @IsOptional()
+  limit: number;
+
+  @IsOptional()
+  sort: string;
+
+  @IsOptional()
+  order: string;
+
+  @IsOptional()
+  search: string;
+
+  @IsOptional()
+  status: string;
+
+  @IsOptional()
+  monthTimeFrame: string;
 }
