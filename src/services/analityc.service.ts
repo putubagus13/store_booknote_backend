@@ -18,8 +18,8 @@ export default class AnalitycService {
       where: {
         storeId,
         createdDt: {
-          [Op.lte]: dto.monthTimeFrame ? moment(dto.monthTimeFrame).endOf('month').toDate() : moment().endOf('month').toDate(),
-          [Op.gt]: dto.monthTimeFrame ? moment(dto.monthTimeFrame).startOf('month').toDate() : moment().startOf('month').toDate(),
+          [Op.lte]: dto.monthTimeFrame ? moment(dto.monthTimeFrame).endOf('month').add(7, 'hour').toDate() : moment().endOf('month').add(7, 'hour').toDate(),
+          [Op.gt]: dto.monthTimeFrame ? moment(dto.monthTimeFrame).startOf('month').add(7, 'hour').toDate() : moment().startOf('month').add(7, 'hour').toDate(),
         },
       },
     });
@@ -29,19 +29,23 @@ export default class AnalitycService {
         storeId,
         createdDt: {
           [Op.lte]: dto.monthTimeFrame
-            ? moment(dto.monthTimeFrame).subtract(1, 'month').endOf('month').toDate()
-            : moment().subtract(1, 'month').endOf('month').toDate(),
+            ? moment(dto.monthTimeFrame).subtract(1, 'month').endOf('month').add(7, 'hour').toDate()
+            : moment().subtract(1, 'month').endOf('month').add(7, 'hour').toDate(),
           [Op.gt]: dto.monthTimeFrame
-            ? moment(dto.monthTimeFrame).subtract(1, 'month').startOf('month').toDate()
-            : moment().subtract(1, 'month').startOf('month').toDate(),
+            ? moment(dto.monthTimeFrame).subtract(1, 'month').startOf('month').add(7, 'hour').toDate()
+            : moment().subtract(1, 'month').startOf('month').add(7, 'hour').toDate(),
         },
       },
     });
 
     const growPercentThisMonth = calculateGrowPercent(productTransactionThisMonth, productTransactionLastMonth);
 
-    const startDateThisWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[0]).toDate() : moment().startOf('week').toDate();
-    const endDateThisWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[1]).toDate() : moment().endOf('week').toDate();
+    const startDateThisWeek = dto.weekTimeFrame
+      ? moment(dto.weekTimeFrame.split(',')[0]).add(7, 'hour').toDate()
+      : moment().startOf('week').add(7, 'hour').toDate();
+    const endDateThisWeek = dto.weekTimeFrame
+      ? moment(dto.weekTimeFrame.split(',')[1]).add(7, 'hour').toDate()
+      : moment().endOf('week').add(7, 'hour').toDate();
 
     const productTransactionThisWeek = await ProductTransaction.findAll({
       where: {
@@ -54,9 +58,11 @@ export default class AnalitycService {
     });
 
     const startDateLastWeek = dto.weekTimeFrame
-      ? moment(dto.weekTimeFrame.split(',')[0]).subtract(1, 'week').toDate()
-      : moment().startOf('week').subtract(2, 'week').toDate();
-    const endDateLastWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[0]).toDate() : moment().startOf('week').subtract(1, 'week').toDate();
+      ? moment(dto.weekTimeFrame.split(',')[0]).subtract(1, 'week').add(7, 'hour').toDate()
+      : moment().startOf('week').subtract(2, 'week').add(7, 'hour').toDate();
+    const endDateLastWeek = dto.weekTimeFrame
+      ? moment(dto.weekTimeFrame.split(',')[0]).add(7, 'hour').toDate()
+      : moment().startOf('week').subtract(1, 'week').add(7, 'hour').toDate();
 
     const productTransactionLastWeek = await ProductTransaction.findAll({
       where: {
@@ -83,9 +89,11 @@ export default class AnalitycService {
     const foundStore = await Store.findOne({ where: { id: storeId, deletedDt: null } });
     if (!foundStore) throw new HttpException(404, 'Store not found');
     const startDateMonth = dto.monthTimeFrame
-      ? moment(dto.monthTimeFrame).startOf('month').format('YYYY-MM-DD')
-      : moment().startOf('month').format('YYYY-MM-DD');
-    const endDateMonth = dto.monthTimeFrame ? moment(dto.monthTimeFrame).endOf('month').format('YYYY-MM-DD') : moment().endOf('month').format('YYYY-MM-DD');
+      ? moment(dto.monthTimeFrame).startOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().startOf('month').add(7, 'hour').format('YYYY-MM-DD');
+    const endDateMonth = dto.monthTimeFrame
+      ? moment(dto.monthTimeFrame).endOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().endOf('month').add(7, 'hour').format('YYYY-MM-DD');
 
     // const startDateWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[0]).format('YYYY-MM-DD') : moment().startOf('week').format('YYYY-MM-DD');
     // const endDateWeek = dto.weekTimeFrame ? moment(dto.weekTimeFrame.split(',')[1]).format('YYYY-MM-DD') : moment().endOf('week').format('YYYY-MM-DD');
@@ -97,7 +105,7 @@ export default class AnalitycService {
         from product_transaction pt 
         where 
             pt.store_id = "${storeId}"
-            and pt.created_dt between "${startDateMonth}" and "${endDateMonth}"
+            and pt.created_dt between "${startDateMonth}" and "${endDateMonth} + interval 1 day"
         group by date(pt.created_dt)
         order by date(pt.created_dt) asc
     `;
@@ -123,7 +131,7 @@ export default class AnalitycService {
         join product p on p.id = pt.product_id 
         where 
             pt.store_id = "${storeId}"
-            and pt.created_dt between "${startDateMonth}" and "${endDateMonth}"
+            and pt.created_dt between "${startDateMonth}" and "${endDateMonth} + interval 1 day"
         group by p.id, p.name, pt.product_id 
     `;
 
