@@ -1,5 +1,5 @@
 import JournalController from '@/controllers/journal.controller';
-import { CreditTransactionDto, GetListJournalDto, JournalSaldoDto, TimeframeDto } from '@/dto/journal.dto';
+import { CreditTransactionDto, GetListJournalDto, JournalSaldoDto, TimeframeDto, exportJournalDto } from '@/dto/journal.dto';
 import { v1 } from '@/global/api-version';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { ValidationMiddleware } from '@/middlewares/validation.middleware';
@@ -17,13 +17,13 @@ export default class JournalRouter {
 
   private initializeRoutes() {
     //post
-    this.router.post(this.path + '/debit', this.authMiddleware.Authenticated, ValidationMiddleware('body', JournalSaldoDto), this.journalController.setSaldo);
-    this.router.post(
-      this.path + '/credit',
-      this.authMiddleware.Authenticated,
-      ValidationMiddleware('body', CreditTransactionDto),
-      this.journalController.creditTransaction,
-    );
+    this.router.post(this.path + '/saldo', this.authMiddleware.Authenticated, ValidationMiddleware('body', JournalSaldoDto), this.journalController.setSaldo);
+    // this.router.post(
+    //   this.path + '/credit',
+    //   this.authMiddleware.Authenticated,
+    //   ValidationMiddleware('body', CreditTransactionDto),
+    //   this.journalController.creditTransaction,
+    // );
 
     //get
     this.router.get(
@@ -38,6 +38,13 @@ export default class JournalRouter {
       this.authMiddleware.Authenticated,
       ValidationMiddleware('query', GetListJournalDto),
       this.journalController.getJournalHistory,
+    );
+
+    this.router.get(
+      this.path + '/export/:storeId',
+      // this.authMiddleware.Authenticated,
+      ValidationMiddleware('query', exportJournalDto),
+      this.journalController.exportJournalHistory,
     );
   }
 }

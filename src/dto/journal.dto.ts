@@ -6,6 +6,12 @@ export class JournalSaldoDto {
 
   @IsNotEmpty()
   storeId: string;
+
+  @IsNotEmpty()
+  description: string;
+
+  @IsNotEmpty()
+  type: string;
 }
 
 export class CreditTransactionDto {
@@ -43,6 +49,11 @@ export class GetListJournalDto {
   @IsOptional()
   status: string;
 
+  @IsOptional()
+  monthTimeFrame: string;
+}
+
+export class exportJournalDto {
   @IsOptional()
   monthTimeFrame: string;
 }

@@ -1,5 +1,5 @@
 import { sequelize } from '@/configs/database.config';
-import { CreditTransactionDto, GetListJournalDto, JournalSaldoDto, TimeframeDto } from '@/dto/journal.dto';
+import { CreditTransactionDto, GetListJournalDto, JournalSaldoDto, TimeframeDto, exportJournalDto } from '@/dto/journal.dto';
 import { HttpException } from '@/global/http-exception';
 import { IAuthTokenPayload } from '@/interfaces/auth.interface';
 import Journal from '@/models/journal.model';
@@ -11,11 +11,14 @@ import moment from 'moment';
 import { Op, QueryTypes } from 'sequelize';
 import { Service } from 'typedi';
 import { v4 } from 'uuid';
-
+import ExcelJS from 'exceljs';
+import { IResListDataJournal } from '@/interfaces/journal';
+import { Response } from 'express';
+import generatedOtp from 'otp-generator';
 @Service()
 export default class JournalService {
   public setSaldo = async (session: IAuthTokenPayload, dto: JournalSaldoDto) => {
-    const { saldo, storeId } = dto;
+    const { saldo, storeId, type, description } = dto;
 
     const foundStore = await Store.findByPk(storeId);
 
@@ -23,40 +26,64 @@ export default class JournalService {
       throw new HttpException(400, 'Store not found');
     }
 
-    const setSaldo = await Journal.create({
-      id: v4(),
-      storeId,
-      status: JournalStatus.DEBIT,
-      amount: saldo,
-      description: 'Initial saldo',
-      createdBy: session.userId,
-      createdDt: new Date(),
-    });
+    const codeInvoice =
+      'SLD' +
+      generatedOtp.generate(10, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: true,
+        specialChars: false,
+      });
+
+    let setSaldo: Journal;
+    if (type === JournalStatus.DEBIT) {
+      setSaldo = await Journal.create({
+        id: v4(),
+        storeId,
+        status: JournalStatus.DEBIT,
+        amount: saldo,
+        code: codeInvoice,
+        description: description,
+        createdBy: session.userId,
+        createdDt: new Date(),
+      });
+    } else {
+      setSaldo = await Journal.create({
+        id: v4(),
+        storeId,
+        status: JournalStatus.CREDIT,
+        amount: -saldo,
+        code: codeInvoice,
+        description: description,
+        createdBy: session.userId,
+        createdDt: new Date(),
+      });
+    }
 
     return setSaldo;
   };
 
-  public creditTransaction = async (session: IAuthTokenPayload, dto: CreditTransactionDto) => {
-    const { amount, storeId, description } = dto;
+  // public creditTransaction = async (session: IAuthTokenPayload, dto: CreditTransactionDto) => {
+  //   const { amount, storeId, description } = dto;
 
-    const foundStore = await Store.findByPk(storeId);
+  //   const foundStore = await Store.findByPk(storeId);
 
-    if (!foundStore) {
-      throw new HttpException(400, 'Store not found');
-    }
+  //   if (!foundStore) {
+  //     throw new HttpException(400, 'Store not found');
+  //   }
 
-    const credit = await Journal.create({
-      id: v4(),
-      storeId,
-      status: JournalStatus.CREDIT,
-      amount,
-      description,
-      createdBy: session.userId,
-      createdDt: new Date(),
-    });
+  //   const credit = await Journal.create({
+  //     id: v4(),
+  //     storeId,
+  //     status: JournalStatus.CREDIT,
+  //     amount: -amount,
+  //     description,
+  //     createdBy: session.userId,
+  //     createdDt: new Date(),
+  //   });
 
-    return credit;
-  };
+  //   return credit;
+  // };
 
   public async calculateIncomeAndExpenses(storeId: string, dto: TimeframeDto) {
     const { monthTimeFrame } = dto;
@@ -106,12 +133,12 @@ export default class JournalService {
     const totalExpensesLastMonth = previousMonthEntries.filter((entry) => entry.status === 'CREDIT').reduce((sum, entry) => sum + entry.amount, 0);
 
     const incomeCalculateThisMonth =
-      totalIncomeThisMonth > 0 ? ((totalIncomeThisMonth / (totalIncomeThisMonth + totalExpensesThisMonth)) * 100).toFixed(2) + '%' : '0%';
+      totalIncomeThisMonth > 0 ? ((totalIncomeThisMonth / (totalIncomeThisMonth + totalExpensesThisMonth * -1)) * 100).toFixed(2) + '%' : '0%';
     const expensesCalculateThisMonth =
-      totalExpensesThisMonth > 0 ? ((totalExpensesThisMonth / (totalIncomeThisMonth + totalExpensesThisMonth)) * 100).toFixed(2) + '%' : '0%';
+      totalExpensesThisMonth * -1 > 0 ? (((totalExpensesThisMonth * -1) / (totalIncomeThisMonth + totalExpensesThisMonth * -1)) * 100).toFixed(2) + '%' : '0%';
 
-    const provitThisMonth = totalIncomeThisMonth - totalExpensesThisMonth;
-    const provitLastMonth = totalIncomeLastMonth - totalExpensesLastMonth;
+    const provitThisMonth = totalIncomeThisMonth - totalExpensesThisMonth * -1;
+    const provitLastMonth = totalIncomeLastMonth - totalExpensesLastMonth * -1;
     const marginProv = provitThisMonth - provitLastMonth;
 
     // Calculate percentage growth for income and expenses
@@ -198,5 +225,63 @@ export default class JournalService {
     payload.items = data;
 
     return payload;
+  };
+
+  public exportJournalHistory = async (res: Response, storeId: string, dto: exportJournalDto) => {
+    const { monthTimeFrame } = dto;
+    // const { offset, sorting } = pagination({ page, sort, order, limit });
+
+    const startOfMonth = monthTimeFrame
+      ? moment(monthTimeFrame).startOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().startOf('month').add(7, 'hour').format('YYYY-MM-DD');
+    const endOfMonth = monthTimeFrame
+      ? moment(monthTimeFrame).endOf('month').add(7, 'hour').format('YYYY-MM-DD')
+      : moment().endOf('month').add(7, 'hour').format('YYYY-MM-DD');
+
+    const queryData = `
+      select
+        j.id,
+        j.amount,
+        j.status,
+        j.description,
+        j.code,
+        j.created_dt as createdDt,
+        u.fullname as createdBy
+      from journal j
+      join user u on u.user_id = j.created_by
+      where j.store_id = '${storeId}'
+      and j.created_dt between '${startOfMonth}' and '${endOfMonth} + interval 1 day'
+      group by j.id
+      order by createdDt asc
+    `;
+
+    const data: IResListDataJournal[] = await sequelize.query(queryData, { type: QueryTypes.SELECT });
+
+    let workbook = new ExcelJS.Workbook();
+    const sheed = workbook.addWorksheet('Journal');
+    sheed.columns = [
+      { header: 'No', key: 'no', width: 5 },
+      { header: 'Code', key: 'code', width: 20 },
+      { header: 'Status', key: 'status', width: 20 },
+      { header: 'Amount', key: 'amount', width: 20 },
+      { header: 'Description', key: 'description', width: 20 },
+      { header: 'Created Date', key: 'createdDt', width: 20 },
+    ];
+
+    data.forEach((item, index) => {
+      sheed.addRow({
+        no: index + 1,
+        code: item.code,
+        status: item.status,
+        amount: item.amount,
+        description: item.description,
+        createdDt: item.createdDt,
+      });
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + 'journal.xlsx');
+
+    return workbook.xlsx.write(res);
   };
 }
