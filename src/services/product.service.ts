@@ -304,7 +304,7 @@ export default class ProductService {
         ph.product_id = "${productId}"
         and ph.deleted_dt is null
         and u.fullname like '${search}'
-        ${startDate ? `and ph.created_dt between '${startDate}' and '${endDate}'` : ''}
+        ${startDate ? `and ph.created_dt between '${startDate}' and '${endDate}' + interval 1 day` : ''}
         ${status ? `and ph.status = '${status}'` : ''}
       group by ph.id
       order by ${sorting}
@@ -320,7 +320,7 @@ export default class ProductService {
       where 
         ph.product_id = "${productId}"
         and ph.deleted_dt is null
-        ${startDate ? `and ph.created_dt between '${startDate}' and '${endDate}'` : ''}
+        ${startDate ? `and ph.created_dt between '${startDate}' and '${endDate}' + interval 1 day` : ''}
         ${status ? `and ph.status = '${status}'` : ''}
       group by ph.id
     `;
