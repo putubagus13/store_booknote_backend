@@ -12,7 +12,7 @@ import { Service } from 'typedi';
 import { v4 } from 'uuid';
 import generatedOtp from 'otp-generator';
 import { pagination } from '@/utils/generals/general.function';
-import { QueryTypes } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { ResponsePagination } from '@/utils/generals/generel.model';
 
 @Service()
@@ -39,6 +39,7 @@ export default class TransactionService {
     });
 
     if (!foundProduct) throw new HttpException(404, 'Product not found');
+    if (foundProduct.stock < productQuantity) throw new HttpException(400, `Stock ${foundProduct.name} is not enough`);
 
     try {
       await sequelize.transaction(async (t) => {
