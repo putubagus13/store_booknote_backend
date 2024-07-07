@@ -1,9 +1,9 @@
 import { PASS, SECRET_KEY, USER } from '@/configs/env.config';
 import { RegisterDto } from '@/dto/auth.dto';
-import { VerifyOtpRegisterDto } from '@/dto/otp.dto';
+import { ResendOtpDto, VerifyOtpRegisterDto } from '@/dto/otp.dto';
 import { HttpException } from '@/global/http-exception';
 import Otp from '@/models/otp.model';
-import { TypeOTP } from '@/utils/enums';
+import { OTPFormat, TypeOTP } from '@/utils/enums';
 import { useOtpGenerated } from '@/utils/generals/general.function';
 import { PayloadSendEmail } from '@/utils/generals/generel.model';
 import { sendOtpEmailTampalte } from '@/utils/html-tamplate';
@@ -135,5 +135,51 @@ export default class OtpService {
     }
 
     return 'User registered';
+  };
+
+  public resendEmailOTPRegistService = async (payload: ResendOtpDto) => {
+    const decoded = jwt.verify(payload.token, SECRET_KEY) as RegisterDto;
+    const codeOtp = useOtpGenerated();
+    console.log(USER, PASS);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      port: 587, // Use `true` for port 465, `false` for all other ports
+      auth: {
+        user: 'putu031216@gmail.com',
+        pass: PASS,
+      },
+    });
+
+    await Otp.create({
+      id: v4(),
+      codeOtp: codeOtp,
+      type: TypeOTP.REGISTER,
+      email: decoded.email,
+      description: 'OTP for register user',
+      expiredDt: new Date(new Date().getTime() + 5 * 60000),
+      createdBy: 'system',
+      createdDt: new Date(),
+    });
+
+    await transporter
+      .sendMail({
+        from: 'noreply',
+        to: decoded.email,
+        subject: OTPFormat.Register,
+        text: OTPFormat.Register,
+        html: sendOtpEmailTampalte({
+          message: OTPFormat.Register,
+          codeOtp: codeOtp,
+          recipient: decoded.email,
+        }),
+      })
+      .then(async (info) => {
+        logger.info('Email sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      })
+      .catch((error) => {
+        logger.error('Error occurred: %s', error.message), console.log(error);
+      });
   };
 }

@@ -17,3 +17,7 @@ export enum JournalStatus {
   DEBIT = 'DEBIT',
   CREDIT = 'CREDIT',
 }
+
+export enum OTPFormat {
+  Register = 'OTP for register user',
+}

@@ -12,3 +12,8 @@ export class VerifyOtpRegisterDto {
     this.codeOtp = codeOtp;
   }
 }
+
+export class ResendOtpDto {
+  @IsNotEmpty()
+  token: string;
+}
