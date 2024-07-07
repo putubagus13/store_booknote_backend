@@ -1,5 +1,6 @@
 import { HttpException } from '@/global/http-exception';
 import StoreType from '@/models/store-type.model';
+import Store from '@/models/store.model';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Service } from 'typedi';
 import { v4 } from 'uuid';
@@ -15,8 +16,16 @@ export class AddStoreTypeDto {
   code: number;
 }
 
+export class UpdateStoreDto {
+  @IsNotEmpty()
+  name: string;
+
+  @IsOptional()
+  imageUrl: string;
+}
+
 @Service()
-export default class StoreTypeService {
+export default class StoreService {
   public addType = async (dto: AddStoreTypeDto) => {
     const findTypeCode = await StoreType.findOne({
       where: { type: dto.code },
@@ -43,5 +52,19 @@ export default class StoreTypeService {
     });
 
     return data;
+  };
+
+  public updateStore = async (storeId: string, dto: UpdateStoreDto) => {
+    const founfStore = await Store.findOne({
+      where: { id: storeId, deletedDt: null },
+    });
+
+    if (!founfStore) throw new HttpException(404, 'Store not found');
+
+    founfStore.name = dto.name;
+    founfStore.storeImageUrl = dto.imageUrl;
+    founfStore.updatedDt = new Date();
+
+    await founfStore.save();
   };
 }
