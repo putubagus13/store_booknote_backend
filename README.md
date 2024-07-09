@@ -12,8 +12,6 @@
 
 ## Teknologi Utama
 
-Aplikasi Tix Event Backend dibangun dengan menggunakan teknologi berikut:
-
 - **Express JS**: Framework Node.js yang digunakan untuk membuat server backend.
 
 - **MySQL**: digunakan sebagai database .
