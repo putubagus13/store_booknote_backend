@@ -18,17 +18,17 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "importHelpers": true,
-    "baseUrl": "./src",
+    "baseUrl": ".", // Set baseUrl to root of the project
     "paths": {
-      "@/*": ["*"],
-      "@configs": ["configs/*"],
-      "@utils/*": ["utils/*"],
-      "@global/*": ["global/*"],
-      "@models/*": ["models/*"],
-      "@services/*": ["services/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@controllers/*": ["controllers/*"],
-      "@routers/*": ["routers/*"]
+      "@/*": ["src/*"], // Adjust paths to point to src folder
+      "@configs/*": ["src/configs/*"],
+      "@utils/*": ["src/utils/*"],
+      "@global/*": ["src/global/*"],
+      "@models/*": ["src/models/*"],
+      "@services/*": ["src/services/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@routers/*": ["src/routers/*"]
     }
   },
   "exclude": ["node_modules", "src/http", "src/logs"],
